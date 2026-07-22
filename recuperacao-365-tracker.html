@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>365 Dias de Recuperação — Controle de Envio</title>
+<style>
+  :root{
+    --bg: #F6F4EF;
+    --bg-card: #FFFFFF;
+    --ink: #23342E;
+    --ink-soft: #5B6B64;
+    --sage: #4E6B5C;
+    --sage-light: #DCE7DF;
+    --gold: #B98B45;
+    --line: #E4E0D6;
+    --done-bg: #EEF3EC;
+    --done-line: #4E6B5C;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Iowan Old Style', 'Georgia', 'Charter', serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{max-width: 880px; margin: 0 auto; padding: 32px 20px 120px;}
+
+  header.top{
+    text-align:center;
+    padding: 28px 10px 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 22px;
+  }
+  header.top h1{
+    font-size: 1.9rem;
+    letter-spacing: 0.01em;
+    margin: 0 0 6px;
+    font-weight: 600;
+    color: var(--sage);
+  }
+  header.top p{
+    margin: 0;
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 1.02rem;
+  }
+
+  .progress-panel{
+    display:flex;
+    align-items:center;
+    gap: 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 22px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .progress-ring-label{
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .progress-count{
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--sage);
+    font-family: 'Iowan Old Style', Georgia, serif;
+  }
+  .progress-bar-track{
+    flex: 1;
+    height: 8px;
+    background: var(--sage-light);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-bar-fill{
+    height: 100%;
+    background: var(--sage);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .today-btn{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.82rem;
+    background: var(--sage);
+    color: #fff;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .today-btn:hover{ background:#3d5648; }
+
+  .controls{
+    display:flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .controls input[type="text"]{
+    flex:1;
+    min-width: 160px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    font-size: 0.92rem;
+    background: var(--bg-card);
+  }
+  select#filterSelect{
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+    font-size: 0.88rem;
+    color: var(--ink);
+  }
+
+  .month-block{ margin-bottom: 18px; }
+  .month-header{
+    display:flex;
+    align-items:baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 4px;
+    cursor: pointer;
+    border-bottom: 2px solid var(--sage-light);
+  }
+  .month-header .m-left{ display:flex; align-items:baseline; gap: 10px;}
+  .month-header h2{
+    margin:0;
+    font-size: 1.25rem;
+    color: var(--sage);
+    font-weight: 600;
+  }
+  .month-header .step-tag{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: #FBF3E7;
+    border: 1px solid #EDD9B6;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .month-header .m-count{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  .month-theme{
+    font-size: 0.86rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    padding: 6px 4px 10px;
+  }
+  .devotional{
+    background: #FBF8F1;
+    border: 1px solid #EEE3CE;
+    border-left: 3px solid var(--gold);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 4px 4px 16px;
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .devotional .dev-label{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .chevron{
+    display:inline-block;
+    transition: transform 0.2s ease;
+    color: var(--ink-soft);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .month-block.collapsed .chevron{ transform: rotate(-90deg); }
+  .month-block.collapsed .day-list, .month-block.collapsed .month-theme, .month-block.collapsed .devotional{ display:none; }
+
+  .day-list{ padding: 4px 0 14px; }
+  .day-row{
+    display:flex;
+    gap: 14px;
+    align-items:flex-start;
+    padding: 13px 8px;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+  }
+  .day-row:hover{ background: #FBFAF6; }
+  .day-row.done{ background: var(--done-bg); }
+
+  .tick{
+    flex-shrink:0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--sage);
+    background: transparent;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: #fff;
+    font-size: 0.85rem;
+    margin-top: 2px;
+  }
+  .day-row.done .tick{ background: var(--sage); }
+
+  .day-content{ flex:1; min-width:0; }
+  .day-meta{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-bottom: 3px;
+    display:flex;
+    gap: 8px;
+    align-items:center;
+  }
+  .day-meta .sent-date{ color: var(--sage); }
+  .day-phrase{
+    font-size: 1.02rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .day-row.done .day-phrase{ color: var(--ink-soft); }
+
+  .day-actions{
+    display:flex;
+    gap: 6px;
+    margin-top: 8px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .copy-btn{
+    font-size: 0.78rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--sage);
+    padding: 5px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .copy-btn:hover{ border-color: var(--sage); background: var(--sage-light); }
+  .copy-btn.copied{ background: var(--sage); color:#fff; border-color: var(--sage); }
+
+  footer{
+    text-align:center;
+    margin-top: 30px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+  footer button{
+    background:none;
+    border: none;
+    text-decoration: underline;
+    color: var(--ink-soft);
+    cursor:pointer;
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 520px){
+    header.top h1{ font-size: 1.5rem; }
+    .progress-panel{ flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>365 Dias de Recuperação</h1>
+    <p>Frase, devocional e controle de envio — só por hoje, um passo de cada vez.</p>
+  </header>
+
+  <div class="progress-panel">
+    <div>
+      <div class="progress-ring-label">Enviadas</div>
+      <div class="progress-count" id="progressCount">0 / 365</div>
+    </div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <button class="today-btn" id="jumpTodayBtn">Ir para hoje</button>
+  </div>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Buscar por palavra na frase...">
+    <select id="filterSelect">
+      <option value="all">Todas as frases</option>
+      <option value="pending">Só pendentes</option>
+      <option value="done">Só enviadas</option>
+    </select>
+  </div>
+
+  <div id="monthsContainer"></div>
+
+  <footer>
+    <p>Seu progresso fica salvo neste navegador.</p>
+    <button id="resetBtn">Zerar todo o progresso</button>
+  </footer>
+
+</div>
+
+<script>
+const DATA = {"months": [{"name": "Janeiro", "passo": "Passo 1", "tema": "Admitimos que éramos impotentes perante o jogo", "devocional": "O Primeiro Passo não pede perfeição — pede honestidade. Por muito tempo, a ilusão de que ainda tínhamos controle foi o que mais nos aprisionou: cada perda parecia pedir só mais uma tentativa, e cada ganho parecia provar que estávamos no comando. Admitir que a vida ficou ingovernável não é um sinal de fraqueza de caráter, é o momento em que finalmente paramos de lutar sozinhos contra algo maior do que nós. É desconfortável olhar de frente para o tamanho do estrago. Mas é exatamente esse olhar honesto, sem disfarces, que abre a primeira porta da recuperação. Este mês, a prática é simples: dizer a verdade sobre onde estamos, um dia de cada vez.", "phrases": ["Admitir que preciso de ajuda não é fraqueza — é o primeiro ato de coragem da minha recuperação.", "Hoje eu escolho a verdade, mesmo quando ela dói mais do que a mentira que eu já contava a mim mesmo.", "Não preciso resolver minha vida inteira hoje. Preciso apenas não jogar hoje.", "A ilusão de controle foi o que mais me custou. Hoje eu solto essa ilusão.", "Reconhecer que perdi o controle é o início de recuperá-lo, de outra forma.", "Cada dia sem jogar é uma prova de que a impotência não é o fim da minha história.", "A honestidade comigo mesmo é o primeiro tijolo da casa que estou reconstruindo.", "Não estou sozinho nesta sala. Nunca mais precisarei estar.", "Minha vida ficou ingovernável porque eu tentava governá-la sozinho. Hoje eu peço ajuda.", "O jogo prometia alívio e entregou caos. Hoje escolho o caminho mais devagar da recuperação.", "Aceitar que sou impotente perante o jogo não me torna fraco — me torna livre para buscar outra força.", "Cada 'só mais uma vez' que eu não disser hoje é uma vitória silenciosa.", "A verdade sobre onde estou é o único lugar de onde posso começar a sair.", "Hoje eu escolho parar de fingir que estava tudo bem.", "Não é vergonha reconhecer a queda. Vergonha seria continuar caindo sozinho.", "Minha recuperação começa toda manhã com uma decisão simples: hoje, não.", "Eu não cheguei aqui por fraqueza de caráter. Cheguei aqui porque finalmente tive coragem de olhar.", "A primeira aposta sempre prometia mais do que entregava. A recuperação entrega mais do que promete.", "Hoje não preciso vencer a doença inteira. Só preciso vencer as próximas 24 horas.", "Reconhecer a derrota para o jogo é o começo da verdadeira virada da minha história.", "Estou aqui porque decidi parar de lutar sozinho contra algo maior do que eu.", "A cada dia que reconheço meus limites, fico mais perto de recuperar minha vida.", "Não existe recuperação sem primeiro admitir que algo estava profundamente errado.", "Hoje escolho a realidade, por mais difícil que seja, no lugar da fantasia do próximo giro.", "O primeiro passo não pede que eu seja perfeito. Pede que eu seja honesto.", "Cada recaída no passado não apaga o valor de recomeçar hoje.", "Minha vida ingovernável de ontem não define o que ela pode ser amanhã.", "Reconhecer o problema é diferente de ser definido por ele. Eu sou mais do que minha compulsão.", "Hoje é dia de coragem simples: dizer a verdade sobre onde estou.", "Um dia de honestidade vale mais do que anos fingindo que estava tudo sob controle.", "Não jogar hoje é suficiente. Amanhã cuido de amanhã."]}, {"name": "Fevereiro", "passo": "Passo 2", "tema": "Passamos a acreditar que um Poder Superior poderia nos trazer de volta à sanidade", "devocional": "Depois de admitir a impotência, vem a pergunta natural: e agora, para onde eu vou? O Segundo Passo não exige uma definição religiosa nem respostas prontas — pede apenas disposição para acreditar que existe algo maior do que a nossa própria força de vontade, capaz de nos ajudar a pensar e viver de um jeito mais são. A insanidade era repetir o mesmo padrão esperando um resultado diferente. A esperança começa a voltar quando paramos de tentar vencer sozinhos e permitimos que outras pessoas, uma comunidade e algo maior caminhem ao nosso lado. Não é preciso ter fé em tudo de uma vez — só o suficiente para dar o próximo passo.", "phrases": ["A esperança que eu tinha perdido está voltando, um dia de cada vez.", "Não preciso entender tudo sobre um Poder Superior. Preciso apenas abrir espaço para acreditar em algo maior que minha compulsão.", "Recuperar a sanidade não é um evento — é uma prática diária.", "Hoje escolho acreditar que a mudança é possível, mesmo sem provas ainda.", "A fé não exige certeza. Exige apenas disposição para tentar mais um dia.", "Encontrar pessoas que entendem minha história me devolveu algo que eu achava perdido: pertencimento.", "Não estou mais sozinho lutando contra algo maior do que eu.", "A esperança cresce em silêncio, mesmo quando ainda não vejo os resultados.", "Acreditar em algo maior do que eu não me diminui — me alivia.", "Cada pessoa nesta sala que se recuperou é prova viva de que isso é possível para mim também.", "Não preciso ter todas as respostas hoje. Só preciso manter a mente aberta.", "Repetir o mesmo padrão esperando um resultado diferente já não faz mais sentido. Hoje escolho um caminho novo.", "Um Poder maior que eu não precisa ter nome — precisa apenas de espaço na minha vida.", "A esperança de hoje é mais forte do que o desespero de ontem.", "Não confio mais só na minha própria força. E isso, paradoxalmente, me fortalece.", "Cada história de recuperação que escuto planta uma semente de esperança na minha.", "Estou aprendendo a acreditar antes de ver — e é isso que chamam de fé.", "Recuperar o modo normal de pensar começa com pequenas escolhas normais, repetidas todos os dias.", "Não sou o único capaz de me ajudar, e isso não é fraqueza — é alívio.", "A esperança não apaga o passado, mas abre espaço para um futuro diferente dele.", "Quando duvido de mim mesmo, posso emprestar a fé de quem já percorreu esse caminho.", "Cada reunião que participo é um lembrete de que a recuperação é real, não apenas possível.", "Acreditar que posso mudar é o primeiro passo para realmente mudar.", "Hoje escolho manter a mente aberta, mesmo diante do que ainda não entendo.", "A sanidade que perdi no jogo está sendo devolvida, aos poucos, pela prática da recuperação.", "Não é preciso ter fé em tudo — só o suficiente para dar o próximo passo.", "Minha esperança de hoje é maior do que meu medo de ontem.", "Acredito que posso ser trazido de volta a um modo de viver mais saudável — e cada dia limpo é prova disso."]}, {"name": "Março", "passo": "Passo 3", "tema": "Decidimos entregar nossa vontade e nossas vidas aos cuidados de um Poder Superior", "devocional": "O Terceiro Passo é, antes de tudo, uma decisão — não um sentimento que precisa chegar primeiro. É comum travar aqui pensando 'não tenho certeza do que acredito', mas a Irmandade é uma comunidade espiritual, não religiosa: cada um segue com o entendimento que tem, e isso já é suficiente para começar. Entregar a vontade não é desistir de agir — é parar de exigir que a vida siga só pelas nossas próprias forças. Quando fechamos a porta para os horrores do passado, abrimos espaço para uma vida nova, mesmo sem saber exatamente como ela vai se desenhar. A prática deste mês é caminhar lado a lado com algo maior, um dia de cada vez.", "phrases": ["Hoje eu decido entregar minha vontade aos cuidados de algo maior do que minha própria teimosia.", "Não preciso carregar tudo sozinho. Essa é a decisão mais leve que já tomei.", "Entregar o controle não é desistir — é parar de lutar contra a correnteza sozinho.", "Espiritualidade não é religião. É a conexão que me tira da solidão da compulsão.", "Cada manhã, decido de novo confiar no processo, mesmo sem ver o caminho inteiro.", "A decisão de hoje não precisa ser perfeita. Precisa apenas ser sincera.", "Deixar de controlar tudo foi assustador — e depois, foi um alívio.", "Confiar em algo maior do que eu não me torna menor. Me torna parte de algo.", "Hoje escolho seguir em frente com a mente aberta, mesmo sem todas as certezas.", "A vontade que antes servia à compulsão, hoje aprendo a colocar a serviço da minha recuperação.", "Entregar não é fraqueza. É a coragem de admitir que sozinho eu não consegui.", "Cada dia que confio no processo é um dia que não preciso controlar tudo sozinho.", "Minha vida muda quando paro de exigir que ela siga só a minha vontade.", "A porta para o passado se fecha. A porta para uma vida nova se abre.", "Não escolho a fé porque tenho certeza — escolho porque a incerteza sozinha já não serve mais.", "Hoje decido caminhar lado a lado com algo maior, em vez de sozinho contra tudo.", "A entrega diária é pequena, mas seus efeitos se acumulam com o tempo.", "Aprendi que abrir mão do controle total é o que abriu espaço para a recuperação real.", "Cada escolha de confiar, mesmo pequena, reconstrói a fé que a compulsão havia abalado.", "Não sei todas as respostas, mas hoje escolho seguir mesmo assim.", "A liberdade que eu buscava no jogo, encontro agora ao entregar o peso que carregava sozinho.", "Decido, hoje, deixar que minha vida seja guiada por algo maior do que meu medo.", "A entrega não acontece uma vez — se pratica todos os dias, em pequenas decisões.", "Confiar no processo não significa não fazer nada. Significa fazer a minha parte e soltar o resto.", "Hoje escolho a humildade de pedir ajuda em vez do orgulho de fingir que não preciso.", "Uma vida guiada por algo maior é mais leve do que uma vida controlada só pelo medo.", "A cada entrega sincera, uma parte do peso antigo vai embora.", "Não preciso ter todas as certezas espirituais — só a disposição de seguir em frente.", "Hoje escolho confiar no próximo passo, mesmo sem ver o caminho inteiro.", "Entregar minha vontade não apaga quem eu sou — revela quem eu posso me tornar.", "Um dia de cada vez, aprendo que não preciso carregar tudo sozinho."]}, {"name": "Abril", "passo": "Passo 4", "tema": "Fizemos um minucioso e destemido inventário moral e financeiro de nós mesmos", "devocional": "Fazer um inventário minucioso não é um exercício de autopunição — é acender a luz em cômodos que evitávamos entrar havia anos. Muitos de nós escondemos até de nós mesmos os padrões que nos levaram até aqui: raiva, ressentimento, medo, orgulho ferido. Olhar para essas partes com honestidade dói, mas é uma dor que liberta, diferente da dor de continuar fugindo. Este inventário não define quem somos — é um mapa que mostra por onde já passamos, para que não precisemos repetir o mesmo caminho. A coragem, aqui, não é não sentir medo; é olhar mesmo com medo.", "phrases": ["Olhar para dentro exige coragem, mas é o único caminho para conhecer quem realmente sou.", "Meu inventário não é uma lista de culpas — é um mapa para entender meus padrões.", "Cada verdade que reconheço sobre mim mesmo tira um pouco do peso que eu carregava escondido.", "Não tenho medo de olhar para minhas falhas. Tenho coragem de finalmente enxergá-las.", "Conhecer meus defeitos não me diminui — me dá o poder de trabalhá-los.", "A honestidade minuciosa comigo mesmo é um ato de amor-próprio, não de autopunição.", "Cada padrão que reconheço hoje é um padrão que não precisa mais me controlar amanhã.", "Fazer meu inventário é acender a luz em cômodos que eu evitava por muito tempo.", "Não sou definido pelos meus erros passados, mas preciso conhecê-los para não repeti-los.", "Hoje encaro minhas falhas sem julgamento excessivo, apenas com o desejo sincero de mudar.", "O medo e o ressentimento perdem força quando finalmente são nomeados.", "Meu passado tem lições, não sentenças. Hoje escolho aprender com ele.", "Cada anotação sincera no meu inventário é um passo a mais para fora da confusão mental.", "Não preciso ser perfeito para começar — só preciso ser honesto.", "Reconhecer meus defeitos de caráter é o primeiro passo para deixar de ser refém deles.", "Minha história tem partes difíceis, mas contá-las com honestidade já é cura.", "Autoconhecimento não é autopunição. É a base sobre a qual reconstruo minha vida.", "Cada medo que enfrento no papel perde um pouco do poder que tinha sobre mim.", "Hoje escolho a coragem de olhar de frente para o que sempre evitei.", "Meu inventário financeiro e moral não é para me condenar — é para me libertar.", "Nomear meus ressentimentos é o primeiro passo para soltá-los.", "Não existe recuperação sem autoconhecimento. E não existe autoconhecimento sem coragem.", "Cada dia dedicado a me conhecer melhor é um dia investido na minha própria liberdade.", "Sou mais do que a soma dos meus erros — mas preciso conhecê-los para crescer.", "A verdade sobre mim mesmo, por mais difícil, é sempre mais leve do que a mentira que eu carregava.", "Hoje escolho examinar minha vida com honestidade, não com vergonha.", "Meus defeitos de caráter não são minha identidade — são apenas pontos a trabalhar.", "Cada página do meu inventário é um passo para fora do esconderijo em que eu vivia.", "Não fujo mais de mim mesmo. Hoje escolho me conhecer, com paciência e verdade.", "O autoconhecimento de hoje é o alicerce da liberdade de amanhã."]}, {"name": "Maio", "passo": "Passo 5", "tema": "Admitimos a nós mesmos e a outro ser humano a natureza exata de nossas falhas", "devocional": "Existe uma diferença enorme entre saber algo sobre nós mesmos e dizer isso em voz alta para outra pessoa. O Quinto Passo pede exatamente essa segunda parte: compartilhar a natureza exata das nossas falhas com alguém de confiança. É natural temer o julgamento, mas o que a maioria de nós encontra do outro lado é alívio — o segredo que nos adoecia em silêncio começa a perder força assim que é dito. Não se trata de reviver a culpa, mas de parar de carregar sozinhos aquilo que nunca deveria ter sido carregado sozinho. Ser ouvido sem julgamento também nos ensina, aos poucos, a nos perdoar.", "phrases": ["Dividir minha verdade com outra pessoa tirou de mim um peso que eu carregava sozinho há anos.", "O alívio que sinto ao ser honesto supera qualquer vergonha que eu temia sentir.", "Compartilhar minhas falhas com alguém de confiança foi libertador, não humilhante.", "Não preciso mais esconder quem eu fui para ser aceito por quem eu sou hoje.", "Cada verdade dita em voz alta perde um pouco do poder que tinha sobre mim em silêncio.", "Ser vulnerável com outra pessoa foi um dos atos mais corajosos da minha recuperação.", "O segredo que eu guardava me adoecia. A verdade compartilhada começou a me curar.", "Não estou mais sozinho com meus erros — e isso muda tudo.", "Admitir minhas falhas a outra pessoa foi assustador, mas o alívio depois valeu cada palavra.", "Cada vez que sou honesto sobre meu passado, fico mais leve para viver o presente.", "A vergonha cresce no silêncio e diminui quando é finalmente dita em voz alta.", "Compartilhar minha história com alguém de confiança me lembrou que sou humano, não um monstro.", "Não preciso mais fingir força. Posso ser honesto sobre minhas fraquezas.", "Cada confissão sincera é um tijolo a menos no muro que me isolava dos outros.", "Ser ouvido sem julgamento me ensinou que eu também posso me perdoar.", "A conexão verdadeira nasce quando paro de esconder quem realmente sou.", "Dizer a verdade sobre mim mesmo é um presente que dou à minha própria recuperação.", "Cada vez que compartilho minha história, ajudo também quem está ouvindo.", "O peso que eu carregava sozinho ficou mais leve assim que dividi com alguém.", "Não há cura no segredo. Há cura na verdade compartilhada com quem se importa.", "Admitir minhas falhas não apaga meu valor — na verdade, revela minha coragem.", "Cada vez que sou sincero sobre meu passado, dou um passo maior rumo à liberdade.", "Falar a verdade em voz alta transforma o que antes só existia como vergonha silenciosa.", "Encontrar alguém que escute sem julgar é um dos maiores presentes da recuperação.", "Minha história, mesmo com partes difíceis, merece ser contada com honestidade.", "Compartilhar não é fraqueza — é a prova de que estou pronto para mudar de verdade.", "Cada palavra honesta dita a outra pessoa é um passo para fora do isolamento.", "Hoje escolho a vulnerabilidade sincera no lugar da máscara que usei por tanto tempo.", "O alívio de ser plenamente honesto vale mais do que o conforto passageiro da mentira.", "Compartilhar minha verdade com alguém de confiança foi o começo da minha própria aceitação.", "Cada vez que sou honesto sobre quem fui, fico mais livre para escolher quem quero ser."]}, {"name": "Junho", "passo": "Passo 6", "tema": "Ficamos inteiramente dispostos a ter esses defeitos de caráter removidos", "devocional": "Não é fácil fazer uma limpeza na própria casa, especialmente quando a sujeira se acumulou por tanto tempo. O Sexto Passo não pede que já tenhamos vencido nossos defeitos de caráter — pede apenas disposição para trabalhá-los, um de cada vez. Os defeitos e as emoções negativas são, na prática, perturbações da serenidade que buscamos. A ideia não é atacar tudo de uma vez, mas escolher o que conseguimos tratar agora, com paciência, sabendo que todo ser humano tem defeitos, e que ficar preso a eles é o que pode nos levar de volta ao jogo. Ir devagar não é fracasso, desde que continuemos indo.", "phrases": ["Não preciso mudar tudo de uma vez. Preciso apenas estar disposto a começar.", "A disposição para mudar já é, em si, uma forma de mudança.", "Meus defeitos de caráter não desaparecem da noite para o dia, e está tudo bem.", "Hoje escolho um defeito de cada vez, com paciência comigo mesmo.", "Estar disposto a mudar é diferente de já ter mudado — e ambos têm valor.", "Cada pequeno progresso na minha forma de agir é uma vitória que merece ser celebrada.", "Não sou o único ser humano com defeitos de caráter. Isso me conecta, não me isola.", "A serenidade que busco começa quando paro de deixar pequenas coisas me desestabilizarem.", "Ir devagar não é fracasso, desde que eu continue indo.", "Cada defeito que reconheço e trabalho é um pouco menos de peso na minha caminhada.", "Não preciso ser perfeito para merecer a recuperação. Preciso apenas estar disposto a crescer.", "A mudança verdadeira é um processo, não um evento único.", "Hoje escolho ficar disposto, mesmo quando a mudança parece difícil demais.", "Meus velhos padrões me protegiam de algo — hoje aprendo novas formas de me proteger.", "Cada dia de disposição sincera vale mais do que anos fingindo que já estava tudo resolvido.", "Não tenho pressa para ser uma pessoa diferente amanhã. Tenho paciência para me tornar, aos poucos.", "A disposição de hoje é a semente da mudança de amanhã.", "Cada defeito que decido trabalhar é um espaço a mais para a serenidade entrar.", "Não fico mais preso aos velhos hábitos só porque eram familiares.", "Estou disposto a deixar ir o que não me serve mais, mesmo quando é desconfortável.", "A verdadeira força está em admitir o que preciso mudar, não em fingir que já mudei.", "Cada escolha consciente hoje enfraquece um pouco mais os padrões antigos.", "Não busco perfeição — busco progresso, um defeito de cada vez.", "Estar disposto a mudar é abrir a porta; a mudança em si acontece devagar, com prática.", "Hoje escolho a paciência comigo mesmo no processo de me tornar quem quero ser.", "Cada dia que trabalho meus defeitos é um dia mais perto da serenidade que busco.", "Não preciso resolver todos os meus defeitos hoje — só preciso estar disposto a começar.", "A disposição sincera para mudar já muda, silenciosamente, o rumo da minha história.", "Meus velhos defeitos foram companheiros por muito tempo. Hoje escolho me despedir deles, aos poucos.", "Estou disposto a crescer, mesmo sabendo que o processo é lento e nem sempre confortável."]}, {"name": "Julho", "passo": "Passo 7", "tema": "Humildemente pedimos que fossem removidas as nossas imperfeições", "devocional": "Humildade, aqui, não tem nada a ver com se diminuir. É simplesmente se ver com honestidade — reconhecer que não conseguimos remover sozinhos os defeitos que identificamos, e que está tudo bem pedir ajuda para isso. Depois de tanto tempo escondendo fraquezas atrás de uma máscara de controle, admitir que ainda estamos em construção é, paradoxalmente, um dos atos mais fortes que existem. Não buscamos a perfeição este mês — buscamos honestidade sobre onde ainda precisamos crescer, e a disposição de continuar pedindo ajuda sempre que for preciso.", "phrases": ["Pedir ajuda não é fraqueza — é a forma mais honesta de força que existe.", "A humildade que hoje pratico é diferente da humilhação que o jogo me causava.", "Não preciso remover minhas imperfeições sozinho. Posso pedir ajuda para isso também.", "Cada pedido sincero de ajuda é um ato de coragem, não de derrota.", "A humildade me ensina que não preciso ter todas as respostas para seguir em frente.", "Hoje escolho pedir, em vez de insistir em resolver tudo sozinho.", "Minhas imperfeições não me definem — são apenas pontos que ainda estou aprendendo a trabalhar.", "A humildade verdadeira não me diminui. Me torna mais aberto para crescer.", "Cada vez que peço ajuda, um pouco do meu antigo orgulho vai embora.", "Não preciso ser autossuficiente o tempo todo. Recuperação também é aprender a receber.", "A humildade de hoje constrói a força que vou precisar amanhã.", "Aceito que ainda tenho imperfeições — e isso não me torna menos digno de recuperação.", "Cada pedido de ajuda sincero fortalece, não enfraquece, minha caminhada.", "Não busco ser perfeito. Busco ser honesto sobre onde ainda preciso crescer.", "A humildade me liberta do peso de precisar controlar tudo sozinho.", "Hoje escolho pedir ajuda para lidar com o que ainda não consigo sozinho.", "Minhas falhas de hoje não apagam meu progresso até aqui.", "A verdadeira força está em reconhecer os próprios limites, não em escondê-los.", "Cada dia que pratico humildade, fico mais aberto para a mudança real.", "Não tenho vergonha de pedir ajuda para remover o que ainda me atrapalha.", "A humildade não é se diminuir — é se ver com honestidade.", "Hoje aceito que ainda estou em construção, e está tudo bem.", "Cada imperfeição reconhecida é um espaço a menos para o orgulho antigo.", "Não preciso vencer sozinho o que nem sozinho consegui enfrentar antes.", "A humildade de pedir ajuda hoje é o que sustenta minha recuperação amanhã.", "Minhas imperfeições continuam sendo trabalhadas, um dia de cada vez, com paciência.", "Aceitar ajuda é um dos atos mais fortes que já pratiquei.", "Hoje escolho a humildade no lugar do orgulho que antes me isolava.", "Cada pedido sincero de ajuda é uma prova de que estou levando minha recuperação a sério.", "Não preciso ser perfeito para ser digno de uma vida melhor.", "A humildade que pratico hoje é o solo onde minha recuperação continua crescendo."]}, {"name": "Agosto", "passo": "Passo 8", "tema": "Fizemos uma lista de todas as pessoas a quem prejudicamos", "devocional": "Olhar para a lista de pessoas que machucamos não é reviver a culpa — é o começo da responsabilidade. A compulsão não destrói só contas bancárias; ela corrói relacionamentos, afasta famílias e rouba a confiança de quem estava por perto. Fazer essa lista com honestidade, sem fugir dos nomes mais difíceis, é o que nos permite finalmente parar de evitar as consequências dos nossos atos passados. Não precisamos ter certeza de como cada reparação vai acontecer — só precisamos estar dispostos a assumir nossa parte. Essa disposição, por si só, já começa a curar algumas das feridas que causamos.", "phrases": ["Reconhecer quem eu machuquei é um ato de responsabilidade, não de autopunição.", "Estou disposto a reparar o mal que causei, mesmo sabendo que leva tempo.", "Cada nome na minha lista representa uma relação que quero honrar com verdade.", "A disposição para reparar já começa a curar algumas das feridas que causei.", "Não posso mudar o passado, mas posso assumir responsabilidade por ele hoje.", "Cada pessoa que machuquei merece minha honestidade sobre o que aconteceu.", "Estou pronto para olhar de frente para o estrago que a compulsão causou ao meu redor.", "A responsabilidade que assumo hoje é diferente da culpa que eu carregava em silêncio.", "Fazer essa lista não é reviver a dor — é abrir caminho para repará-la.", "Cada relação que quero reconstruir começa com a disposição sincera de reparar.", "Não fujo mais das consequências dos meus atos passados.", "A coragem de hoje é olhar para quem eu machuquei sem me esconder atrás da vergonha.", "Estou disposto a fazer as pazes com meu passado, uma relação de cada vez.", "Cada nome nessa lista é também um lembrete de quem eu não quero mais ser.", "Assumir responsabilidade pelos meus atos é um passo em direção à minha própria liberdade.", "Não posso desfazer o passado, mas posso me comprometer a reparar o que for possível.", "A disposição para reparar é maior do que o medo de encarar o desconforto.", "Cada relação prejudicada merece ser olhada com honestidade, mesmo que doa.", "Hoje escolho a responsabilidade no lugar da fuga que praticava antes.", "Estou disposto a reconstruir, mesmo sabendo que algumas coisas talvez não voltem a ser como antes.", "Cada item da minha lista é também um compromisso silencioso comigo mesmo.", "A cura que busco também passa por reconhecer a dor que causei aos outros.", "Não escondo mais quem eu machuquei. Hoje me disponho a reparar.", "Assumir minha parte no que aconteceu é libertador, mesmo sendo difícil.", "Cada nome nessa lista representa uma chance de fazer diferente a partir de agora.", "A disposição sincera para reparar já é, por si só, um ato de cura.", "Não posso apagar o passado, mas posso escolher agir diferente a partir de hoje.", "Cada relação que reconheço ter machucado merece minha honestidade e meu esforço.", "Estou disposto a encarar o desconforto de hoje para construir a paz de amanhã.", "A responsabilidade que assumo agora é um presente que dou à minha própria recuperação.", "Cada passo em direção à reparação é também um passo para fora da culpa que eu carregava."]}, {"name": "Setembro", "passo": "Passo 9", "tema": "Reparamos diretamente os danos causados, sempre que possível", "devocional": "Reparar diretamente exige coragem — e também sabedoria para escolher a hora certa, com cuidado para não causar mais dano no processo. Nem toda reparação acontece em palavras: muitas vezes ela se constrói em silêncio, através de uma mudança consistente de comportamento ao longo do tempo. Não fazemos isso para sermos perdoados imediatamente, mas porque é parte de quem estamos nos tornando. Não podemos controlar como a outra pessoa vai receber nossa reparação — só podemos ser sinceros ao oferecê-la, e ter paciência com o tempo que ela levar para surtir efeito.", "phrases": ["Reparar diretamente exige coragem, mas também sabedoria para saber a hora certa.", "Cada reparação sincera é um tijolo na reconstrução da confiança que o jogo abalou.", "Não busco reparar para me sentir bem — busco reparar porque é a coisa certa a fazer.", "Algumas reparações levam tempo, e isso não diminui minha disposição de fazê-las.", "Cuidar para não causar mais dano ao reparar é também parte da minha recuperação.", "Cada passo de reparação, por menor que seja, importa para quem foi machucado.", "Não espero perdão imediato. Ofereço minha responsabilidade e sigo em frente com paciência.", "A reparação verdadeira não é sobre me livrar da culpa, é sobre honrar quem eu prejudiquei.", "Cada conversa difícil de reparação é também um ato de coragem que fortalece minha recuperação.", "Reparar diretamente, quando possível, é uma das formas mais concretas de assumir minha história.", "Não posso controlar como o outro vai receber minha reparação — só posso ser sincero ao oferecê-la.", "Algumas reparações são silenciosas, através de uma mudança consistente de comportamento.", "Cada gesto de reparação, mesmo pequeno, ajuda a reconstruir o que foi abalado.", "Estou disposto a esperar o tempo certo para reparar sem causar mais dor.", "A reparação sincera fala mais alto do que qualquer desculpa dita às pressas.", "Cada relação que consigo reparar é um pedaço da minha vida que recupero também.", "Não faço reparações para ser perdoado — faço porque é parte de quem estou me tornando.", "Reparar com cuidado é diferente de reparar com pressa. Escolho o caminho mais consciente.", "Cada passo de reparação me aproxima de uma vida guiada por integridade.", "Não posso desfazer o passado, mas posso agir hoje de um jeito que honre quem fui machucado.", "Algumas reparações acontecem em palavras. Outras, em ações contínuas ao longo do tempo.", "Cada reparação sincera é também uma forma de cuidar da minha própria recuperação.", "Estou disposto a reparar mesmo quando é desconfortável, porque é assim que reconstruo a confiança.", "Reparar diretamente, sempre que possível, é um dos atos mais concretos da minha mudança.", "Cada gesto de responsabilidade hoje é um investimento na confiança de amanhã.", "Não corro para reparar de qualquer jeito. Escolho fazer isso com cuidado e verdade.", "Cada reparação bem-feita é um capítulo novo na relação que eu quase perdi.", "Estou aprendendo que reparar é um processo, não um evento único.", "A confiança que reconstruo, reparação após reparação, vale cada esforço que faço hoje.", "Cada passo sincero de reparação é também um passo maior para a minha própria paz."]}, {"name": "Outubro", "passo": "Passo 10", "tema": "Continuamos fazendo inventário pessoal e, quando errados, prontamente o admitimos", "devocional": "A recuperação não termina depois dos primeiros passos — ela se sustenta na prática diária. O Décimo Passo pede que continuemos revisando nosso comportamento, não com dureza, mas com honestidade gentil, admitindo prontamente quando erramos, em vez de deixar o orgulho guardar o erro em silêncio até ele crescer. Um pequeno ajuste diário evita que precisemos de grandes reparações no futuro. Este mês é sobre manutenção: terminar cada dia em paz com nossas próprias ações, revisando, ajustando e seguindo em frente.", "phrases": ["Continuar meu inventário diário é o que mantém minha recuperação viva e honesta.", "Quando erro, escolho admitir prontamente, em vez de deixar o orgulho crescer em silêncio.", "Cada dia é uma nova oportunidade de me observar com honestidade e gentileza.", "Não espero acumular erros para depois olhar para eles. Reviso meu dia enquanto ele acontece.", "Admitir um erro pequeno hoje evita que ele se torne um padrão amanhã.", "Minha recuperação não termina nos primeiros passos — se mantém viva na prática diária.", "Cada noite, reservo um momento para perguntar: onde eu poderia ter agido melhor hoje?", "Não me julgo com dureza pelos erros — apenas os reconheço e sigo em frente.", "A honestidade diária comigo mesmo é o que impede que os velhos padrões voltem.", "Cada vez que admito prontamente um erro, evito que ele cresça dentro de mim.", "Minha recuperação é feita de pequenos ajustes diários, não de perfeição constante.", "Hoje escolho revisar meu dia com a mesma honestidade que revisei meu passado.", "Não deixo ressentimentos pequenos se acumularem — cuido deles assim que aparecem.", "Cada dia de inventário sincero fortalece o alicerce da minha recuperação.", "Admitir estar errado não me diminui — mantém minha integridade em dia.", "Estou sempre em processo, e isso é exatamente como deveria ser.", "Cada erro reconhecido a tempo é uma recaída evitada mais à frente.", "Não preciso ser perfeito hoje — só preciso continuar sendo honesto.", "A manutenção diária da minha recuperação é tão importante quanto os grandes passos que já dei.", "Cada noite, escolho terminar o dia em paz com minhas próprias ações.", "Reconhecer um erro rapidamente é mais leve do que carregá-lo em silêncio por dias.", "Minha honestidade de hoje protege minha recuperação de amanhã.", "Cada pequeno ajuste diário evita que eu precise de grandes reparações no futuro.", "Não guardo mágoas de mim mesmo — corrijo o que posso e sigo em frente.", "A prática diária de honestidade é o que transforma recuperação em um novo modo de vida.", "Hoje escolho olhar para meu comportamento sem medo, apenas com vontade de melhorar.", "Cada inventário diário, por menor que seja, é um cuidado que ofereço à minha própria recuperação.", "Não deixo o orgulho me impedir de admitir quando estou errado.", "Minha recuperação se sustenta nas pequenas honestidades do dia a dia.", "Cada dia que termino em paz comigo mesmo é uma vitória silenciosa da recuperação.", "Sigo revisando, ajustando e seguindo em frente — um dia de cada vez, sempre."]}, {"name": "Novembro", "passo": "Passo 11", "tema": "Buscamos, pela oração e meditação, melhorar nosso contato consciente", "devocional": "O Décimo Primeiro Passo não pede respostas grandiosas, mas um hábito simples: reservar um momento de silêncio para melhorar o contato consciente com algo maior do que nós. Não se trata de pedir para saber tudo, mas de buscar clareza para o próximo passo certo. Cada pausa antes de reagir por impulso, cada respiração consciente, é um investimento na serenidade que buscamos. A prática constante, mesmo em dias difíceis, é o que sustenta essa estabilidade — não a perfeição da meditação, mas a repetição gentil dela, dia após dia.", "phrases": ["Reservar um momento de silêncio todos os dias me reconecta com o que realmente importa.", "Não busco respostas prontas na oração — busco apenas contato consciente comigo e com algo maior.", "Cada momento de quietude que pratico fortalece minha serenidade para o resto do dia.", "A meditação não precisa ser perfeita. Precisa apenas ser praticada, com constância.", "Hoje escolho um momento de pausa antes de agir por impulso.", "Cada respiração consciente me traz de volta ao presente, longe da ansiedade do passado ou do futuro.", "Não peço para saber tudo — peço apenas clareza para o próximo passo certo.", "A quietude diária é onde encontro força para enfrentar o que o dia trouxer.", "Cada momento de reflexão silenciosa me afasta um pouco mais da impulsividade antiga.", "Não preciso de todas as respostas hoje. Preciso apenas de conexão e presença.", "A prática diária de silêncio me ensina a ouvir além do barulho da ansiedade.", "Cada dia que reservo um tempo para mim mesmo, fortaleço minha recuperação em silêncio.", "Não busco fugir dos meus pensamentos — busco observá-los com mais calma.", "A serenidade que pratico na quietude se estende para o resto do meu dia.", "Cada momento de conexão consciente me lembra que não estou sozinho nessa caminhada.", "Hoje escolho pausar antes de reagir, e ouvir antes de decidir.", "A meditação diária é um espaço só meu, sem pressa e sem julgamento.", "Cada instante de silêncio praticado é um investimento na minha estabilidade emocional.", "Não preciso de grandes revelações — pequenos momentos de clareza já bastam.", "A prática constante, mesmo em dias difíceis, é o que sustenta minha serenidade.", "Cada pausa consciente que faço hoje evita uma reação impulsiva amanhã.", "Busco, na quietude, força para fazer o que é certo, não o que é mais fácil.", "A conexão que cultivo em silêncio me acompanha nos momentos mais barulhentos do dia.", "Hoje escolho ouvir mais e reagir menos.", "Cada momento de reflexão sincera é um cuidado que ofereço à minha própria mente.", "Não corro atrás de certezas absolutas — sigo em frente com a clareza possível de cada dia.", "A prática diária de silêncio me devolve um pouco da paz que a compulsão havia tomado.", "Cada respiração profunda é um lembrete de que posso escolher como reagir.", "Busco clareza para agir bem, não perfeição para acertar sempre.", "A serenidade de hoje começou em um momento simples de pausa e silêncio."]}, {"name": "Dezembro", "passo": "Passo 12", "tema": "Procuramos levar esta mensagem a outros jogadores", "devocional": "O Décimo Segundo Passo se resume a uma palavra: importar-se. Ajudar outra pessoa em recuperação não exige ter todas as respostas — exige apenas disposição para se importar, seja em um telefonema, uma conversa após a reunião ou simplesmente contando a própria história. É dando que recebemos: o esforço de tentar ajudar já fortalece nossa própria recuperação, mesmo quando não conseguimos ver o resultado. Fechamos o ano lembrando que praticar estes princípios em todas as áreas da vida — não só evitando o jogo, mas vivendo com mais honestidade, humildade e cuidado — é o verdadeiro objetivo de todo este caminho.", "phrases": ["Ajudar outra pessoa em recuperação me fortalece tanto quanto fortalece quem recebe a ajuda.", "Cada gesto de cuidado com outro jogador em recuperação é também um cuidado comigo mesmo.", "A mensagem que carrego hoje pode ser exatamente o que outra pessoa precisa ouvir.", "Servir aos outros na recuperação transformou minha própria forma de entender a doença.", "Cada telefonema, cada conversa após a reunião, é um tijolo na recuperação de alguém.", "Não preciso ter todas as respostas para ajudar — só preciso estar disposto a me importar.", "Contar minha história ajuda outra pessoa a acreditar que a recuperação também é possível para ela.", "Cada gesto simples de apoio pode ser o que resgata a esperança de alguém.", "A recuperação que vivo hoje só faz sentido quando também é compartilhada.", "Estar presente para outro membro é uma das formas mais profundas de viver este programa.", "Cada dia de serviço fortalece a minha própria gratidão pela recuperação que tenho.", "Não escondo mais minha história — hoje ela pode ser ponte para a recuperação de outra pessoa.", "Ajudar não é sobre ter sucesso garantido — é sobre o esforço sincero de tentar.", "Cada pessoa nova que chega à sala merece encontrar alguém disposto a se importar.", "A gratidão que sinto hoje nasce de olhar para o quanto já percorri.", "Praticar os princípios da recuperação em todas as áreas da vida é o verdadeiro objetivo deste caminho.", "Cada gesto de generosidade na recuperação devolve mais do que jamais recebi jogando.", "Servir aos outros é a forma mais concreta de agradecer pela minha própria recuperação.", "Um telefonema simples pode significar, para alguém, a diferença entre desistir e continuar.", "Cada dia limpo que vivo é também um exemplo silencioso para quem ainda está começando.", "A recuperação se fortalece quando é vivida em comunidade, não em isolamento.", "Hoje escolho ser, para outra pessoa, o que alguém já foi para mim.", "Cada ato de serviço, por menor que seja, alimenta minha própria gratidão.", "Termino este ano diferente de como comecei — e essa mudança merece ser celebrada.", "Cada passo dado ao longo deste ano importa, mesmo os mais silenciosos.", "A gratidão pelo que já conquistei não apaga o quanto ainda tenho a caminhar.", "Cada recomeço, ao longo do ano, foi também uma prova da minha capacidade de continuar.", "Celebro cada dia sem jogar como a vitória real que ele é.", "O que aprendi neste ano se torna a base sobre a qual construo o próximo.", "Levar esta mensagem adiante é a forma mais completa de viver os 12 Passos.", "Só por hoje, e amanhã de novo só por hoje: assim se constrói uma vida nova."]}]};
+const STORAGE_KEY = 'recuperacao365_progress_v1';
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function saveProgress(progress){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }catch(e){}
+}
+
+let progress = loadProgress(); // { "1-1": "2026-07-22", "1-2": "..." }
+
+function dayKey(monthIdx, dayNum){ return monthIdx + '-' + dayNum; }
+
+function todayMonthDay(){
+  const now = new Date();
+  return { month: now.getMonth(), day: now.getDate() };
+}
+
+function formatDateBR(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR');
+}
+
+function totalPhrases(){
+  return DATA.months.reduce((sum, m) => sum + m.phrases.length, 0);
+}
+
+function updateProgressPanel(){
+  const doneCount = Object.keys(progress).length;
+  document.getElementById('progressCount').textContent = doneCount + ' / ' + totalPhrases();
+  const pct = Math.round((doneCount / totalPhrases()) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function copyToClipboard(text, btn){
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copiar frase';
+      btn.classList.remove('copied');
+    }, 1500);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copiado!';
+    setTimeout(() => { btn.textContent = 'Copiar frase'; }, 1500);
+  });
+}
+
+function render(){
+  const container = document.getElementById('monthsContainer');
+  container.innerHTML = '';
+  const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+  const filterMode = document.getElementById('filterSelect').value;
+  const today = todayMonthDay();
+
+  DATA.months.forEach((month, mIdx) => {
+    const block = document.createElement('div');
+    block.className = 'month-block';
+    block.id = 'month-' + mIdx;
+
+    const header = document.createElement('div');
+    header.className = 'month-header';
+    const doneInMonth = month.phrases.filter((_, i) => progress[dayKey(mIdx, i+1)]).length;
+    header.innerHTML = '<div class="m-left"><span class="chevron">▾</span><h2>' + month.name + '</h2><span class="step-tag">' + month.passo + '</span></div><span class="m-count">' + doneInMonth + '/' + month.phrases.length + '</span>';
+    header.addEventListener('click', () => {
+      block.classList.toggle('collapsed');
+    });
+    block.appendChild(header);
+
+    const theme = document.createElement('div');
+    theme.className = 'month-theme';
+    theme.textContent = month.tema;
+    block.appendChild(theme);
+
+    if (month.devocional) {
+      const devo = document.createElement('div');
+      devo.className = 'devotional';
+      const label = document.createElement('span');
+      label.className = 'dev-label';
+      label.textContent = 'Devocional do mês — ' + month.passo;
+      const text = document.createElement('div');
+      text.textContent = month.devocional;
+      devo.appendChild(label);
+      devo.appendChild(text);
+      block.appendChild(devo);
+    }
+
+    const list = document.createElement('div');
+    list.className = 'day-list';
+
+    let visibleCount = 0;
+
+    month.phrases.forEach((phrase, i) => {
+      const day = i + 1;
+      const key = dayKey(mIdx, day);
+      const isDone = !!progress[key];
+
+      if (searchTerm && !phrase.toLowerCase().includes(searchTerm)) return;
+      if (filterMode === 'pending' && isDone) return;
+      if (filterMode === 'done' && !isDone) return;
+      visibleCount++;
+
+      const row = document.createElement('div');
+      row.className = 'day-row' + (isDone ? ' done' : '');
+      row.id = 'day-' + mIdx + '-' + day;
+
+      const tick = document.createElement('button');
+      tick.className = 'tick';
+      tick.setAttribute('aria-label', 'Marcar como enviada');
+      tick.textContent = isDone ? '✓' : '';
+      tick.addEventListener('click', () => {
+        if (progress[key]) {
+          delete progress[key];
+        } else {
+          progress[key] = new Date().toISOString();
+        }
+        saveProgress(progress);
+        render();
+      });
+
+      const content = document.createElement('div');
+      content.className = 'day-content';
+
+      const meta = document.createElement('div');
+      meta.className = 'day-meta';
+      let metaHtml = 'Dia ' + day;
+      if (isDone) {
+        metaHtml += ' · <span class="sent-date">enviada em ' + formatDateBR(progress[key]) + '</span>';
+      }
+      meta.innerHTML = metaHtml;
+
+      const phraseEl = document.createElement('div');
+      phraseEl.className = 'day-phrase';
+      phraseEl.textContent = phrase;
+
+      const actions = document.createElement('div');
+      actions.className = 'day-actions';
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-btn';
+      copyBtn.textContent = 'Copiar frase';
+      copyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        copyToClipboard(phrase, copyBtn);
+      });
+      actions.appendChild(copyBtn);
+
+      content.appendChild(meta);
+      content.appendChild(phraseEl);
+      content.appendChild(actions);
+
+      row.appendChild(tick);
+      row.appendChild(content);
+      list.appendChild(row);
+    });
+
+    if (visibleCount === 0) {
+      block.style.display = 'none';
+    } else {
+      block.style.display = '';
+    }
+
+    block.appendChild(list);
+    container.appendChild(block);
+  });
+
+  updateProgressPanel();
+}
+
+document.getElementById('searchInput').addEventListener('input', render);
+document.getElementById('filterSelect').addEventListener('change', render);
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Tem certeza que quer zerar todo o progresso de envio? Essa ação não pode ser desfeita.')) {
+    progress = {};
+    saveProgress(progress);
+    render();
+  }
+});
+document.getElementById('jumpTodayBtn').addEventListener('click', () => {
+  const today = todayMonthDay();
+  const block = document.getElementById('month-' + today.month);
+  if (block) {
+    block.classList.remove('collapsed');
+    block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const dayRow = document.getElementById('day-' + today.month + '-' + today.day);
+    if (dayRow) {
+      setTimeout(() => {
+        dayRow.style.outline = '2px solid #B98B45';
+        dayRow.style.outlineOffset = '2px';
+        setTimeout(() => { dayRow.style.outline = 'none'; }, 2000);
+      }, 400);
+    }
+  }
+});
+
+render();
+</script>
+</body>
+</html>

@@ -203,12 +203,13 @@
     display:flex;
     align-items:baseline;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 10px;
     padding: 12px 4px;
     cursor: pointer;
     border-bottom: 2px solid var(--sage-light);
   }
-  .month-header .m-left{ display:flex; align-items:baseline; gap: 10px;}
+  .month-header .m-left{ display:flex; align-items:baseline; flex-wrap: wrap; gap: 10px;}
   .month-header h2{
     margin:0;
     font-size: 1.25rem;
@@ -275,6 +276,8 @@
     display:flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
     margin-bottom: 10px;
     font-family: 'Helvetica Neue', Arial, sans-serif;
   }
@@ -367,6 +370,7 @@
     display:flex;
     gap: 6px;
     margin-top: 8px;
+    flex-wrap: wrap;
     font-family: 'Helvetica Neue', Arial, sans-serif;
   }
   .copy-btn{
@@ -465,8 +469,15 @@
   }
 
   @media (max-width: 520px){
+    .wrap{ padding: 20px 14px 100px; }
     header.top h1{ font-size: 1.5rem; }
     .progress-panel{ flex-wrap: wrap; }
+    .steps-map{ gap: 0; }
+    .step-node{ min-width: 68px; padding: 8px 9px; }
+    .step-node-label{ font-size: 0.62rem; }
+    .day-actions{ gap: 5px; }
+    .copy-btn{ font-size: 0.74rem; padding: 5px 10px; }
+    .virtue-pair{ font-size: 1.1rem; }
   }
 </style>
 </head>
